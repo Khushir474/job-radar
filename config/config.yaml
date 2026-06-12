@@ -13,7 +13,7 @@ log_format: "json"
 alerts:
   # Discord
   discord_enabled: true
-  discord_webhook_url: "https://discord.com/api/webhooks/1515065351870742700/q5o2vT9nexeZZPtM2GEzALRIJ140qF2_kqNTiSa6TqVkcoER5JO7z9vsnZboCDErBmOf"
+  discord_webhook_url: "https://discord.com/api/webhooks/1515075840726012074/1Q9E4t8rQj9iBmkDUxMeqorS4zbKfKXNLgxrAV80TAeDRZBqsULxTdEn8umgKhysGAte"
 
   # File (always enabled for local logging)
   file_enabled: true

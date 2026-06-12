@@ -52,6 +52,7 @@ class CompanyStorage:
                 enabled=c.enabled,
                 priority=c.priority,
                 custom_scraper=c.custom_scraper,
+                webhook=c.webhook,
                 created_at=c.created_at,
                 updated_at=c.updated_at,
                 last_scraped=c.last_scraped,

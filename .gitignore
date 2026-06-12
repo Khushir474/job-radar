@@ -228,3 +228,9 @@ logs/
 
 # Job Radar - Deployment config (app-specific, user personal)
 fly.toml
+
+# other documents
+BEGINNER_GUIDE.html
+BEGINNER_GUIDE.md
+CONVERT_TO_PDF.md
+LEARNING_GUIDE.md

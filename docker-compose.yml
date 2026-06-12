@@ -6,7 +6,7 @@ services:
     container_name: job-radar
     restart: unless-stopped
     environment:
-      - DATABASE_URL=sqlite+aiosqlite:///data/job_radar.db
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///data/job_radar.db}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_CHAT_IDS=${TELEGRAM_CHAT_IDS}
       - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
@@ -37,7 +37,7 @@ services:
     container_name: job-radar-cron
     restart: unless-stopped
     environment:
-      - DATABASE_URL=sqlite+aiosqlite:///data/job_radar.db
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///data/job_radar.db}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_CHAT_IDS=${TELEGRAM_CHAT_IDS}
       - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
@@ -64,7 +64,7 @@ services:
     build: .
     container_name: job-radar-test
     environment:
-      - DATABASE_URL=sqlite+aiosqlite:///data/job_radar.db
+      - DATABASE_URL=${DATABASE_URL:-sqlite+aiosqlite:///data/job_radar.db}
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs

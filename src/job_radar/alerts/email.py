@@ -48,14 +48,16 @@ class EmailChannel(BaseAlertChannel):
         message.add_alternative(html_content, subtype="html")
         
         try:
+            use_tls = self.config.email_use_tls and self.config.email_smtp_port == 465
+            start_tls = not use_tls and self.config.email_smtp_port == 587
             await aiosmtplib.send(
                 message,
                 hostname=self.config.email_smtp_host,
                 port=self.config.email_smtp_port,
                 username=self.config.email_username,
                 password=self.config.email_password,
-                use_tls=self.config.email_use_tls,
-                start_tls=not self.config.email_use_tls,  # Use STARTTLS if not using implicit TLS
+                use_tls=use_tls,
+                start_tls=start_tls,
             )
             return True, None
         except aiosmtplib.SMTPAuthenticationError:
@@ -69,15 +71,17 @@ class EmailChannel(BaseAlertChannel):
         """Test SMTP connection"""
         if not all([self.config.email_smtp_host, self.config.email_username, self.config.email_password]):
             return False, "SMTP credentials not configured"
-        
+
         try:
+            use_tls = self.config.email_use_tls and self.config.email_smtp_port == 465
+            start_tls = not use_tls and self.config.email_smtp_port == 587
             await aiosmtplib.connect(
                 hostname=self.config.email_smtp_host,
                 port=self.config.email_smtp_port,
                 username=self.config.email_username,
                 password=self.config.email_password,
-                use_tls=self.config.email_use_tls,
-                start_tls=not self.config.email_use_tls,
+                use_tls=use_tls,
+                start_tls=start_tls,
             )
             return True, "SMTP connection successful"
         except Exception as e:

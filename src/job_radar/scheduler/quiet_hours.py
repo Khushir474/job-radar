@@ -40,10 +40,10 @@ class QuietHoursChecker:
         # Handle overnight quiet hours (e.g., 22:00 to 06:00)
         if self.start_time > self.end_time:
             # Quiet hours span midnight
-            return current_time >= self.start_time or current_time <= self.end_time
+            return current_time >= self.start_time or current_time < self.end_time
         else:
             # Quiet hours within same day
-            return self.start_time <= current_time <= self.end_time
+            return self.start_time <= current_time < self.end_time
     
     def next_active_time(self, dt: Optional[datetime] = None) -> datetime:
         """Get the next time when quiet hours end"""

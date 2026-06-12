@@ -30,7 +30,7 @@ RUN mkdir -p data logs
 
 # Set environment variables
 ENV PYTHONPATH=/app/src
-ENV DATABASE_URL=sqlite+aiosqlite:///data/job_radar.db
+# DATABASE_URL should be set via .env or docker-compose, defaults to SQLite if not provided
 
 # Run as non-root user
 RUN useradd -m -u 1000 jobradar && chown -R jobradar:jobradar /app

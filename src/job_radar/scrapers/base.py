@@ -75,16 +75,16 @@ class BaseScraper(ABC):
         wait=wait_exponential(multiplier=1, min=2, max=10),
         reraise=True,
     )
-    async def _fetch(self, url: str) -> httpx.Response:
+    async def _fetch(self, url: str, params: Optional[dict] = None, **kwargs) -> httpx.Response:
         """Fetch URL with retry logic"""
         assert self.client is not None
-        response = await self.client.get(url)
+        response = await self.client.get(url, params=params, **kwargs)
         response.raise_for_status()
         return response
-    
-    async def _fetch_json(self, url: str) -> dict:
+
+    async def _fetch_json(self, url: str, params: Optional[dict] = None, **kwargs) -> dict:
         """Fetch and parse JSON"""
-        response = await self._fetch(url)
+        response = await self._fetch(url, params=params, **kwargs)
         return response.json()
     
     async def _fetch_html(self, url: str) -> HTMLParser:

@@ -11,10 +11,10 @@ from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from job_radar.models import (
-    AppConfig, Company, CompanyDB, RoleCategory, ExperienceLevel,
+    AppConfig, Company, RoleCategory, ExperienceLevel,
     ATSType, JobType, AlertConfig, FilterConfig, SchedulerConfig
 )
-from job_radar.database import DatabaseManager
+from job_radar.database import DatabaseManager, CompanyDB
 
 
 class Settings(BaseSettings):
@@ -288,14 +288,6 @@ BUILTIN_COMPANIES = [
         priority=2,
     ),
     Company(
-        id="cohere",
-        name="Cohere",
-        career_url="https://cohere.com/careers",
-        ats_type=ATSType.GREENHOUSE,
-        ats_config={"board_token": "cohere"},
-        priority=1,
-    ),
-    Company(
         id="adept",
         name="Adept",
         career_url="https://www.adept.ai/careers",
@@ -440,7 +432,7 @@ class ConfigManager:
             config.alerts.telegram_bot_token = self.settings.telegram_bot_token
         if self.settings.telegram_chat_ids:
             config.alerts.telegram_chat_ids = [
-                c.strip() for c in self.settings.telegram_chat_ids.split(",")
+                c.strip() for c in self.settings.telegram_chat_ids.split(",") if c.strip()
             ]
         if self.settings.discord_webhook_url:
             config.alerts.discord_enabled = True

@@ -1,0 +1,138 @@
+# Job Radar Configuration
+# US-focused with referral and general companies
+
+# Database
+database_url: "sqlite+aiosqlite:///data/job_radar.db"
+
+# Logging
+log_level: "INFO"
+log_file: "logs/job_radar.log"
+log_format: "json"
+
+# Alert Channels
+alerts:
+  # Discord
+  discord_enabled: true
+  discord_webhook_url: "https://discord.com/api/webhooks/1515065351870742700/q5o2vT9nexeZZPtM2GEzALRIJ140qF2_kqNTiSa6TqVkcoER5JO7z9vsnZboCDErBmOf"
+
+  # File (always enabled for local logging)
+  file_enabled: true
+  file_path: "data/alerts.log"
+  file_format: "json"
+
+  # General
+  include_description: true
+  max_jobs_per_alert: 10
+
+# Job Filters
+filters:
+  # Role categories to track
+  roles:
+    - "data_analyst"
+    - "data_scientist"
+    - "ml_engineer"
+    - "ai_engineer"
+    - "research_scientist"
+    - "applied_scientist"
+    - "ml_researcher"
+    - "data_engineer"
+    - "ai_researcher"
+
+  # US locations only - be permissive to catch all US roles
+  locations:
+    - "United States"
+    - "USA"
+    - "Remote"
+    - "Anywhere"
+    # US States (for specific matches)
+    - "California"
+    - "CA"
+    - "New York"
+    - "NY"
+    - "Texas"
+    - "TX"
+    - "Massachusetts"
+    - "MA"
+    - "Washington"
+    - "WA"
+    - "Colorado"
+    - "CO"
+    - "Illinois"
+    - "IL"
+    - "Florida"
+    - "FL"
+    - "Georgia"
+    - "GA"
+    - "Pennsylvania"
+    - "PA"
+    - "Ohio"
+    - "OH"
+    - "Virginia"
+    - "VA"
+    # Major US cities
+    - "San Francisco"
+    - "New York City"
+    - "Seattle"
+    - "Boston"
+    - "Austin"
+    - "Denver"
+    - "Los Angeles"
+    - "Chicago"
+    - "Atlanta"
+    - "Washington DC"
+    - "NYC"
+    - "SF"
+
+  # Experience levels (empty = all)
+  experience_levels: []
+
+  # Job types (empty = all)
+  job_types: []
+
+  # Keywords that exclude a job
+  excluded_keywords:
+    - "intern"
+    - "internship"
+    - "co-op"
+    - "coop"
+    - "student"
+    - "entry level"
+    - "new grad"
+    - "university"
+    - "campus"
+    - "fellow"
+    - "fellowship"
+    - "apprentice"
+    - "apprenticeship"
+    - "volunteer"
+    - "unpaid"
+
+  # Keywords that must be present (empty = no requirement)
+  required_keywords: []
+
+  # Salary filters (optional)
+  min_salary: null
+  max_salary: null
+  currency: "USD"
+
+# Scheduler
+scheduler:
+  check_interval_hours: 2
+  quiet_hours_start: "22:00"  # 10 PM
+  quiet_hours_end: "06:00"    # 6 AM
+  timezone: "America/Los_Angeles"
+  max_concurrent_scrapers: 5
+  request_timeout: 30
+  retry_attempts: 3
+  retry_delay: 5
+  daily_summary_enabled: true
+  daily_summary_time: "09:00"
+
+# Companies (auto-populated from built-in list + user_companies.yaml)
+companies: []
+
+# User companies configuration file
+user_companies_file: "config/user_companies.yaml"
+
+# Keywords configuration file
+keywords_file: "config/keywords.yaml"

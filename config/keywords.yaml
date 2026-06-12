@@ -16,6 +16,8 @@ data_analyst:
   - "sql analyst"
   - "data insights"
   - "analytics engineer"
+  - "SQL"
+  - "excel"
 
 data_scientist:
   - "data scientist"
@@ -87,13 +89,13 @@ applied_scientist:
   - "production ml"
   - "ml application"
 
-ml_researcher:
-  - "ml researcher"
-  - "machine learning researcher"
-  - "ai ml researcher"
-  - "deep learning engineer"
-  - "neural network researcher"
-  - "model architecture"
+# ml_researcher:
+#   - "ml researcher"
+#   - "machine learning researcher"
+#   - "ai ml researcher"
+#   - "deep learning engineer"
+#   - "neural network researcher"
+#   - "model architecture"
 
 data_engineer:
   - "data engineer"

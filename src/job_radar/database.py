@@ -129,7 +129,7 @@ class AlertLogDB(Base):
 class UserCompanyDB(Base):
     """User-added companies"""
     __tablename__ = "user_companies"
-    
+
     id = Column(String(100), primary_key=True)
     name = Column(String(200), nullable=False)
     career_url = Column(String(500), nullable=False)
@@ -138,9 +138,13 @@ class UserCompanyDB(Base):
     search_keywords = Column(JSON, default=[])
     enabled = Column(Boolean, default=True)
     priority = Column(Integer, default=10)  # Lower priority than built-in
-    notes = Column(Text, nullable=True)
+    custom_scraper = Column(String(100), nullable=True)
+    webhook = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_scraped = Column(DateTime, nullable=True)
+    last_scrape_status = Column(String(100), nullable=True)
+    jobs_found_total = Column(Integer, default=0)
     
     __table_args__ = (
         Index("ix_user_companies_enabled", "enabled"),
@@ -202,14 +206,21 @@ class DatabaseManager:
         async with self.session() as session:
             return await session.get(CompanyDB, company_id)
     
-    async def get_enabled_companies(self) -> list[CompanyDB]:
+    async def get_enabled_companies(self) -> list[CompanyDB | UserCompanyDB]:
         async with self.session() as session:
-            result = await session.execute(
+            # Get from both built-in and user companies tables
+            builtin = await session.execute(
                 select(CompanyDB)
                 .where(CompanyDB.enabled == True)
                 .order_by(CompanyDB.priority)
             )
-            return list(result.scalars().all())
+            user = await session.execute(
+                select(UserCompanyDB)
+                .where(UserCompanyDB.enabled == True)
+                .order_by(UserCompanyDB.priority)
+            )
+            companies = list(builtin.scalars().all()) + list(user.scalars().all())
+            return sorted(companies, key=lambda c: c.priority)
     
     async def update_company_scrape_status(
         self, company_id: str, status: str, jobs_found: int = 0
@@ -229,9 +240,14 @@ class DatabaseManager:
                 db_job.last_seen_at = datetime.utcnow()
                 db_job.is_new = False
                 for key, value in job.model_dump(exclude={"id", "first_seen_at"}).items():
-                    setattr(db_job, key, value)
+                    if key == "url":
+                        setattr(db_job, key, str(value))
+                    else:
+                        setattr(db_job, key, value)
             else:
-                db_job = JobDB(**job.model_dump())
+                data = job.model_dump()
+                data['url'] = str(job.url)
+                db_job = JobDB(**data)
                 session.add(db_job)
             await session.flush()
             return db_job
@@ -316,7 +332,9 @@ class DatabaseManager:
     # User companies
     async def add_user_company(self, company: Company) -> UserCompanyDB:
         async with self.session() as session:
-            db_company = UserCompanyDB(**company.model_dump())
+            data = company.model_dump()
+            data['career_url'] = str(company.career_url)
+            db_company = UserCompanyDB(**data)
             session.add(db_company)
             await session.flush()
             return db_company

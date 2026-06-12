@@ -1,5 +1,5 @@
 # User-Added Companies
-# Add your custom companies here
+# ===== REFERRAL COMPANIES (where Khushi has connections) =====
 
 companies:
   - id: "dune-security"
@@ -11,9 +11,8 @@ companies:
       job_list_selector: ".job, .position, .career-item"
       title_selector: "h2, h3, .job-title"
       url_selector: "a"
-    search_keywords: ["security", "data", "ml", "ai"]
     enabled: true
-    priority: 2
+    priority: 1
 
   - id: "yahoo"
     name: "Yahoo"
@@ -22,20 +21,18 @@ companies:
     ats_config:
       tenant: "ouryahoo"
       career_site: "careers"
-    search_keywords: ["data", "ml", "ai", "engineer"]
     enabled: true
     priority: 1
 
   - id: "bbh"
-    name: "BBH"
+    name: "BBH (Brown Brothers Harriman)"
     career_url: "https://bbh.wd5.myworkdayjobs.com/en-US/BBH"
     ats_type: "workday"
     ats_config:
       tenant: "bbh"
       career_site: "BBH"
-    search_keywords: ["data", "ml", "ai", "analyst", "scientist"]
     enabled: true
-    priority: 2
+    priority: 1
 
   - id: "scotiabank"
     name: "Scotiabank"
@@ -46,9 +43,8 @@ companies:
       job_list_selector: ".job-item, .position, [data-job-id]"
       title_selector: "h2, h3, .job-title"
       url_selector: "a"
-    search_keywords: ["data", "ml", "ai", "analytics"]
     enabled: true
-    priority: 2
+    priority: 1
 
   - id: "vanguard"
     name: "Vanguard"
@@ -57,7 +53,6 @@ companies:
     ats_config:
       tenant: "vanguard"
       career_site: "vanguard_external"
-    search_keywords: ["data", "ml", "ai", "engineer", "scientist"]
     enabled: true
     priority: 1
 
@@ -70,7 +65,6 @@ companies:
       job_list_selector: ".job-item, .position, .job-listing"
       title_selector: "h2, h3, .job-title"
       url_selector: "a"
-    search_keywords: ["data", "ml", "ai", "research", "scientist"]
     enabled: true
     priority: 1
 
@@ -80,29 +74,38 @@ companies:
     ats_type: "lever"
     ats_config:
       board_token: "reddogmedia"
-    search_keywords: ["data", "ml", "ai", "engineer"]
     enabled: true
-    priority: 2
+    priority: 1
 
-  - id: "avoca"
-    name: "Avoca"
-    career_url: "https://jobs.ashbyhq.com/avoca"
+  - id: "haus"
+    name: "Haus"
+    career_url: "https://www.haus.io/careers"
     ats_type: "ashby"
     ats_config:
-      board_token: "avoca"
-    search_keywords: ["data", "ml", "ai", "engineer", "researcher"]
+      board_token: "haus"
     enabled: true
-    priority: 2
+    priority: 1
 
-  - id: "rilla"
-    name: "Rilla"
-    career_url: "https://jobs.ashbyhq.com/rilla"
+  - id: "polymarket"
+    name: "Polymarket"
+    career_url: "https://jobs.ashbyhq.com/polymarket"
     ats_type: "ashby"
     ats_config:
-      board_token: "rilla"
-    search_keywords: ["data", "ml", "ai", "engineer"]
+      board_token: "polymarket"
     enabled: true
-    priority: 2
+    priority: 1
+
+  - id: "fora-travel"
+    name: "Fora Travel"
+    career_url: "https://www.foratravel.com/careers/jobs"
+    ats_type: "custom"
+    ats_config:
+      base_url: "https://www.foratravel.com/careers/jobs"
+      job_list_selector: ".job, .position, .job-item"
+      title_selector: "h2, h3, .job-title"
+      url_selector: "a"
+    enabled: true
+    priority: 1
 
 # ===== GENERAL COMPANIES (No Referrals) =====
 # These send to separate Discord webhook

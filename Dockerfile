@@ -22,7 +22,6 @@ RUN uv pip install --system --no-cache -r pyproject.toml
 
 # Copy application code
 COPY src/ ./src/
-COPY scripts/ ./scripts/
 COPY config/ ./config/
 
 # Create data and logs directories

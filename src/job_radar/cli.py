@@ -11,9 +11,6 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-
 from job_radar.config import ConfigManager, Settings
 from job_radar.database import init_database, get_db_manager
 from job_radar.storage import UserCompanyStorage

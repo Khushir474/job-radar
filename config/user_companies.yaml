@@ -1,0 +1,105 @@
+# User-Added Companies
+# Add your custom companies here
+
+companies:
+  - id: "dune-security"
+    name: "Dune Security"
+    career_url: "https://www.dune.security/careers"
+    ats_type: "custom"
+    ats_config:
+      base_url: "https://www.dune.security/careers"
+      job_list_selector: ".job, .position, .career-item"
+      title_selector: "h2, h3, .job-title"
+      url_selector: "a"
+    search_keywords: ["security", "data", "ml", "ai"]
+    enabled: true
+    priority: 2
+
+  - id: "yahoo"
+    name: "Yahoo"
+    career_url: "https://ouryahoo.wd5.myworkdayjobs.com/en-US/careers"
+    ats_type: "workday"
+    ats_config:
+      tenant: "ouryahoo"
+      career_site: "careers"
+    search_keywords: ["data", "ml", "ai", "engineer"]
+    enabled: true
+    priority: 1
+
+  - id: "bbh"
+    name: "BBH"
+    career_url: "https://bbh.wd5.myworkdayjobs.com/en-US/BBH"
+    ats_type: "workday"
+    ats_config:
+      tenant: "bbh"
+      career_site: "BBH"
+    search_keywords: ["data", "ml", "ai", "analyst", "scientist"]
+    enabled: true
+    priority: 2
+
+  - id: "scotiabank"
+    name: "Scotiabank"
+    career_url: "https://jobs.scotiabank.com/search"
+    ats_type: "custom"
+    ats_config:
+      base_url: "https://jobs.scotiabank.com"
+      job_list_selector: ".job-item, .position, [data-job-id]"
+      title_selector: "h2, h3, .job-title"
+      url_selector: "a"
+    search_keywords: ["data", "ml", "ai", "analytics"]
+    enabled: true
+    priority: 2
+
+  - id: "vanguard"
+    name: "Vanguard"
+    career_url: "https://vanguard.wd5.myworkdayjobs.com/vanguard_external"
+    ats_type: "workday"
+    ats_config:
+      tenant: "vanguard"
+      career_site: "vanguard_external"
+    search_keywords: ["data", "ml", "ai", "engineer", "scientist"]
+    enabled: true
+    priority: 1
+
+  - id: "ibm"
+    name: "IBM"
+    career_url: "https://careers.ibm.com/en_US/careers"
+    ats_type: "custom"
+    ats_config:
+      base_url: "https://careers.ibm.com"
+      job_list_selector: ".job-item, .position, .job-listing"
+      title_selector: "h2, h3, .job-title"
+      url_selector: "a"
+    search_keywords: ["data", "ml", "ai", "research", "scientist"]
+    enabled: true
+    priority: 1
+
+  - id: "red-dog-media"
+    name: "Red Dog Media"
+    career_url: "https://jobs.lever.co/reddogmedia"
+    ats_type: "lever"
+    ats_config:
+      board_token: "reddogmedia"
+    search_keywords: ["data", "ml", "ai", "engineer"]
+    enabled: true
+    priority: 2
+
+  - id: "avoca"
+    name: "Avoca"
+    career_url: "https://jobs.ashbyhq.com/avoca"
+    ats_type: "ashby"
+    ats_config:
+      board_token: "avoca"
+    search_keywords: ["data", "ml", "ai", "engineer", "researcher"]
+    enabled: true
+    priority: 2
+
+  - id: "rilla"
+    name: "Rilla"
+    career_url: "https://jobs.ashbyhq.com/rilla"
+    ats_type: "ashby"
+    ats_config:
+      board_token: "rilla"
+    search_keywords: ["data", "ml", "ai", "engineer"]
+    enabled: true
+    priority: 2

@@ -40,6 +40,7 @@ dependencies = [
     "python-telegram-bot>=21.0",
     "discord-webhook>=1.2",
     "aiosmtplib>=3.0",
+    "aiofiles>=23.0",
     
     # CLI
     "typer>=0.12",

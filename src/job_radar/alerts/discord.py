@@ -30,49 +30,51 @@ class DiscordChannel(BaseAlertChannel):
 
         try:
             async with httpx.AsyncClient(timeout=30) as client:
-                # For large batches, send summary + company breakdown
-                if len(jobs) > 20:
-                    # Send summary message
-                    summary = self._format_summary(jobs)
-                    payload = {
-                        "content": summary,
-                        "username": "Job Radar",
-                        "avatar_url": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-                    }
-                    response = await client.post(webhook_url, json=payload)
-                    response.raise_for_status()
+                # Send one job per message (or multiple if list passed)
+                formatter = AlertFormatter(self.config)
 
-                    # Send company breakdown
-                    breakdown = self._format_company_breakdown(jobs)
-                    if breakdown:
-                        payload = {
-                            "content": breakdown,
-                            "username": "Job Radar",
-                        }
-                        response = await client.post(webhook_url, json=payload)
-                        response.raise_for_status()
+                if len(jobs) == 1:
+                    # Single job - format nicely
+                    content = self._format_single_job_message(jobs[0])
                 else:
-                    # For small batches, send detailed list
-                    formatter = AlertFormatter(self.config)
+                    # Multiple jobs (shouldn't happen with new system, but handle it)
                     content = formatter.format_for_channel("discord", jobs)
 
-                    # Discord has 2000 char limit per message
-                    if len(content) > 1900:
-                        content = content[:1900] + "\n... (see file log for full list)"
+                # Discord has 2000 char limit
+                if len(content) > 1900:
+                    content = content[:1900]
 
-                    payload = {
-                        "content": content,
-                        "username": "Job Radar",
-                        "avatar_url": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-                    }
-                    response = await client.post(webhook_url, json=payload)
-                    response.raise_for_status()
+                payload = {
+                    "content": content,
+                    "username": "Job Radar",
+                }
+
+                response = await client.post(webhook_url, json=payload)
+                response.raise_for_status()
 
                 return True, None
         except httpx.HTTPStatusError as e:
             return False, f"Discord webhook error: {e.response.status_code} - {e.response.text}"
         except Exception as e:
             return False, f"Error sending to Discord: {str(e)}"
+
+    def _format_single_job_message(self, job: Job) -> str:
+        """Format a single job for Discord message"""
+        lines = [
+            f"**{job.company_id.upper()}**",
+            f"*{job.title}*",
+        ]
+
+        if job.location:
+            lines.append(f"Location: {job.location}")
+
+        if job.experience_level:
+            exp = job.experience_level.value.replace('_', ' ').title()
+            lines.append(f"Level: {exp}")
+
+        lines.append(f"\n{job.url}")
+
+        return "\n".join(filter(None, lines))
 
     def _format_summary(self, jobs: list[Job]) -> str:
         """Format summary message for large job batches"""

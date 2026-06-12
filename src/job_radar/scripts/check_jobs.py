@@ -125,64 +125,52 @@ async def check_jobs() -> int:
     
     logger.info(f"Total scraped: {total_scraped}, Matched: {total_matched}, New: {len(all_new_jobs)}")
 
-    # Send alerts for new jobs (group by company webhook if available)
-    success_channels = []
+    # Send individual alert per job
+    success_count = 0
     if all_new_jobs:
-        logger.info(f"Sending alerts for {len(all_new_jobs)} new jobs...")
+        logger.info(f"Sending individual alerts for {len(all_new_jobs)} new jobs...")
 
-        # Group jobs by their company's webhook (if specified)
-        jobs_by_webhook = {}
         for job in all_new_jobs:
-            company = next((c for c in companies if c.id == job.company_id), None)
-            if company and hasattr(company, 'webhook') and company.webhook:
-                webhook_url = company.webhook
-                if webhook_url not in jobs_by_webhook:
-                    jobs_by_webhook[webhook_url] = []
-                jobs_by_webhook[webhook_url].append(job)
-            else:
-                # Use default webhook
-                if None not in jobs_by_webhook:
-                    jobs_by_webhook[None] = []
-                jobs_by_webhook[None].append(job)
+            try:
+                # Find company for webhook
+                company = next((c for c in companies if c.id == job.company_id), None)
+                webhook_url = None
 
-        # Send to each webhook
-        all_results = {}
-        for webhook_url, jobs in jobs_by_webhook.items():
-            if webhook_url:
-                # Create temporary alert config with custom webhook
-                custom_config = config.alerts.model_copy()
-                custom_config.discord_webhook_url = webhook_url
-                custom_alert_manager = AlertManager(custom_config)
-                logger.info(f"Sending {len(jobs)} jobs to custom webhook...")
-                results = await custom_alert_manager.send_alerts(jobs)
-            else:
-                # Use default alert manager
-                results = await alert_manager.send_alerts(jobs)
+                if company and hasattr(company, 'webhook') and company.webhook:
+                    webhook_url = company.webhook
+                    # Create custom alert manager with company webhook
+                    custom_config = config.alerts.model_copy()
+                    custom_config.discord_webhook_url = webhook_url
+                    job_alert_manager = AlertManager(custom_config)
+                else:
+                    # Use default alert manager
+                    job_alert_manager = alert_manager
 
-            all_results.update(results)
+                # Send individual job alert
+                results = await job_alert_manager.send_alerts([job])
 
-        # Track which channels succeeded
-        success_channels = [ch for ch, (ok, _) in all_results.items() if ok]
-        
-        if success_channels:
-            job_ids = [job.id for job in all_new_jobs]
-            await job_storage.mark_alerted(job_ids, success_channels)
+                # Check if any channel succeeded
+                success_channels = [ch for ch, (ok, _) in results.items() if ok]
+                if success_channels:
+                    await job_storage.mark_alerted([job.id], success_channels)
+                    await seen_storage.increment_alerts(job.company_id, job.external_id, success_channels)
 
-            for job in all_new_jobs:
-                await seen_storage.increment_alerts(job.company_id, job.external_id, success_channels)
+                    # Log delivery
+                    for channel in success_channels:
+                        await alert_log.log_delivery(job.id, channel, None, "sent")
 
-            # Log alert deliveries
-            for job in all_new_jobs:
-                for channel in success_channels:
-                    await alert_log.log_delivery(job.id, channel, None, "sent")
+                    success_count += 1
+                    logger.info(f"Sent alert for {job.title} ({job.company_id})")
+                else:
+                    # Log failures
+                    for channel, (success, error) in results.items():
+                        if not success:
+                            await alert_log.log_delivery(job.id, channel, None, "failed", error)
+                            logger.error(f"Failed to send {job.title} to {channel}: {error}")
+            except Exception as e:
+                logger.error(f"Error sending alert for job {job.id}: {e}")
 
-        # Log failures
-        for channel, (success, error) in all_results.items():
-            if not success:
-                for job in all_new_jobs:
-                    await alert_log.log_delivery(job.id, channel, None, "failed", error)
-
-        logger.info(f"Alert results: {all_results}")
+        logger.info(f"Sent {success_count}/{len(all_new_jobs)} alerts")
     else:
         logger.info("No new matching jobs found")
     

@@ -1,6 +1,6 @@
 # Job Radar 🔍
 
-Automated job alert system for **Data Analyst, Data Scientist, ML Engineer, and AI roles** at **30+ top AI companies** plus your custom companies. Sends alerts via **iMessage, Telegram, Discord, Email, and File** every 2 hours with quiet hours (10 PM - 6 AM PST).
+Automated job alert system for **Data Analyst, Data Scientist, ML Engineer, and AI roles** at **30+ top AI companies** plus your custom companies. Sends alerts via **iMessage, Telegram, Discord, Email, and File** every 30 minutes with quiet hours (10 PM - 6 AM PST).
 
 ## Features
 

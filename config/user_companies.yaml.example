@@ -1,0 +1,14 @@
+# User-Added Companies
+# Add your custom companies here
+
+companies:
+  # Example:
+  # - id: "my-ai-startup"
+  #   name: "My AI Startup"
+  #   career_url: "https://myaistartup.com/careers"
+  #   ats_type: "greenhouse"
+  #   ats_config:
+  #     board_token: "myaistartup"
+  #   search_keywords: ["ml", "ai", "llm"]
+  #   enabled: true
+  #   priority: 5

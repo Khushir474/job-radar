@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  job-radar:
+    build: .
+    container_name: job-radar
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///data/job_radar.db
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_IDS=${TELEGRAM_CHAT_IDS}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - EMAIL_SMTP_HOST=${EMAIL_SMTP_HOST}
+      - EMAIL_SMTP_PORT=${EMAIL_SMTP_PORT}
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - EMAIL_RECIPIENTS=${EMAIL_RECIPIENTS}
+      - IMESSAGE_RECIPIENTS=${IMESSAGE_RECIPIENTS}
+      - CHECK_INTERVAL_HOURS=2
+      - QUIET_HOURS_START=22:00
+      - QUIET_HOURS_END=06:00
+      - TIMEZONE=America/Los_Angeles
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    # For local development with live reload
+    # command: python -m job_radar.cli check
+    # Uncomment below for cron-like behavior (every 2 hours)
+    # entrypoint: ["sh", "-c", "while true; do python -m job_radar.cli check; sleep 7200; done"]
+
+  # Alternative: Run with cron scheduler
+  job-radar-cron:
+    build: .
+    container_name: job-radar-cron
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///data/job_radar.db
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_IDS=${TELEGRAM_CHAT_IDS}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - EMAIL_SMTP_HOST=${EMAIL_SMTP_HOST}
+      - EMAIL_SMTP_PORT=${EMAIL_SMTP_PORT}
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - EMAIL_RECIPIENTS=${EMAIL_RECIPIENTS}
+      - IMESSAGE_RECIPIENTS=${IMESSAGE_RECIPIENTS}
+      - CHECK_INTERVAL_HOURS=2
+      - QUIET_HOURS_START=22:00
+      - QUIET_HOURS_END=06:00
+      - TIMEZONE=America/Los_Angeles
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    entrypoint: ["sh", "-c", "while true; do python -m job_radar.cli check; echo 'Sleeping for 2 hours...'; sleep 7200; done"]
+
+  # For testing with manual trigger
+  job-radar-test:
+    build: .
+    container_name: job-radar-test
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///data/job_radar.db
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    entrypoint: ["python", "-m", "job_radar.cli", "check"]

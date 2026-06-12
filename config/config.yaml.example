@@ -1,0 +1,122 @@
+# Job Radar Configuration Example
+# Copy to config/config.yaml and customize
+
+# Database
+database_url: "sqlite+aiosqlite:///data/job_radar.db"
+
+# Logging
+log_level: "INFO"
+log_file: "logs/job_radar.log"
+
+# Alert Channels
+alerts:
+  # iMessage (macOS only, requires imsg CLI or Messages app)
+  imessage_enabled: false
+  imessage_recipients: []  # Phone numbers or emails
+
+  # Telegram (requires bot token and chat IDs)
+  telegram_enabled: false
+  telegram_bot_token: ""  # Set via TELEGRAM_BOT_TOKEN env var
+  telegram_chat_ids: []   # Set via TELEGRAM_CHAT_IDS env var (comma-separated)
+
+  # Discord (requires webhook URL)
+  discord_enabled: false
+  discord_webhook_url: ""  # Set via DISCORD_WEBHOOK_URL env var
+
+  # Email (requires SMTP credentials)
+  email_enabled: false
+  email_smtp_host: "smtp.gmail.com"
+  email_smtp_port: 587
+  email_username: ""      # Set via EMAIL_USERNAME env var
+  email_password: ""      # Set via EMAIL_PASSWORD env var
+  email_from: ""          # From address
+  email_recipients: []    # Set via EMAIL_RECIPIENTS env var (comma-separated)
+  email_use_tls: true
+
+  # File (always enabled for local logging)
+  file_enabled: true
+  file_path: "data/alerts.log"
+  file_format: "json"  # json, markdown, txt
+
+  # General
+  include_description: true
+  max_jobs_per_alert: 10
+
+# Job Filters
+filters:
+  # Role categories to track
+  roles:
+    - "data_analyst"
+    - "data_scientist"
+    - "ml_engineer"
+    - "ai_engineer"
+    - "research_scientist"
+    - "applied_scientist"
+    - "ml_researcher"
+    - "data_engineer"
+    - "ai_researcher"
+
+  # Preferred locations (supports fuzzy matching)
+  locations:
+    - "Remote"
+    - "Anywhere"
+    - "United States"
+    - "USA"
+    - "San Francisco"
+    - "New York"
+    - "Seattle"
+    - "Boston"
+    - "Austin"
+    - "Los Angeles"
+    - "Chicago"
+    - "Washington DC"
+    - "Denver"
+    - "Atlanta"
+
+  # Experience levels (empty = all)
+  experience_levels: []
+
+  # Job types (empty = all)
+  job_types: []
+
+  # Keywords that exclude a job
+  excluded_keywords:
+    - "intern"
+    - "internship"
+    - "co-op"
+    - "coop"
+    - "student"
+    - "entry level"
+    - "new grad"
+    - "university"
+    - "campus"
+    - "fellow"
+    - "fellowship"
+    - "apprentice"
+    - "apprenticeship"
+    - "volunteer"
+    - "unpaid"
+
+  # Keywords that must be present (empty = no requirement)
+  required_keywords: []
+
+  # Salary filters (optional)
+  min_salary: null
+  max_salary: null
+  currency: "USD"
+
+# Scheduler
+scheduler:
+  check_interval_hours: 2
+  quiet_hours_start: "22:00"  # 10 PM
+  quiet_hours_end: "06:00"    # 6 AM
+  timezone: "America/Los_Angeles"
+  max_concurrent_scrapers: 5
+  request_timeout: 30
+  retry_attempts: 3
+  retry_delay: 5
+  daily_summary_enabled: true
+  daily_summary_time: "09:00"
+
+# Companies (auto-populated from built-in list + user_companies.yaml)
+companies: []

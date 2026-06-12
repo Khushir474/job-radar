@@ -1,0 +1,29 @@
+[Unit]
+Description=Job Radar - AI Job Alert System
+Documentation=https://github.com/Khushir474/job-radar
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=jobradar
+Group=jobradar
+WorkingDirectory=/home/jobradar/job-radar
+Environment=PATH=/home/jobradar/job-radar/.venv/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=-/home/jobradar/job-radar/.env
+ExecStart=/home/jobradar/job-radar/.venv/bin/python -m job_radar.cli check
+StandardOutput=journal
+StandardError=journal
+
+# Resource limits
+MemoryMax=512M
+CPUQuota=50%
+
+# Security
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/home/jobradar/job-radar/data /home/jobradar/job-radar/logs
+
+[Install]
+WantedBy=multi-user.target

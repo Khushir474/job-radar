@@ -103,3 +103,62 @@ companies:
     search_keywords: ["data", "ml", "ai", "engineer"]
     enabled: true
     priority: 2
+
+# ===== GENERAL COMPANIES (No Referrals) =====
+# These send to separate Discord webhook
+
+  - id: "google"
+    name: "Google"
+    career_url: "https://careers.google.com"
+    ats_type: "custom"
+    ats_config:
+      base_url: "https://careers.google.com"
+      job_list_selector: ".job, .position, .listing"
+      title_selector: "h2, h3, .title"
+      url_selector: "a"
+    search_keywords: ["data", "ml", "ai", "engineer", "scientist"]
+    webhook: "https://discord.com/api/webhooks/1515075840726012074/1Q9E4t8rQj9iBmkDUxMeqorS4zbKfKXNLgxrAV80TAeDRZBqsULxTdEn8umgKhysGAte"
+    enabled: true
+    priority: 1
+
+  - id: "microsoft"
+    name: "Microsoft"
+    career_url: "https://careers.microsoft.com"
+    ats_type: "custom"
+    ats_config:
+      base_url: "https://careers.microsoft.com"
+      job_list_selector: ".job, .position, .listing"
+      title_selector: "h2, h3, .title"
+      url_selector: "a"
+    search_keywords: ["data", "ml", "ai", "engineer", "scientist"]
+    webhook: "https://discord.com/api/webhooks/1515075840726012074/1Q9E4t8rQj9iBmkDUxMeqorS4zbKfKXNLgxrAV80TAeDRZBqsULxTdEn8umgKhysGAte"
+    enabled: true
+    priority: 1
+
+  - id: "amazon"
+    name: "Amazon"
+    career_url: "https://amazon.jobs"
+    ats_type: "custom"
+    ats_config:
+      base_url: "https://amazon.jobs"
+      job_list_selector: ".job, .position, .listing"
+      title_selector: "h2, h3, .title"
+      url_selector: "a"
+    search_keywords: ["data", "ml", "ai", "engineer", "scientist"]
+    webhook: "https://discord.com/api/webhooks/1515075840726012074/1Q9E4t8rQj9iBmkDUxMeqorS4zbKfKXNLgxrAV80TAeDRZBqsULxTdEn8umgKhysGAte"
+    enabled: true
+    priority: 1
+
+  - id: "meta"
+    name: "Meta"
+    career_url: "https://www.metacareers.com"
+    ats_type: "custom"
+    ats_config:
+      base_url: "https://www.metacareers.com"
+      job_list_selector: ".job, .position, .listing"
+      title_selector: "h2, h3, .title"
+      url_selector: "a"
+    search_keywords: ["data", "ml", "ai", "engineer", "scientist"]
+    webhook: "https://discord.com/api/webhooks/1515075840726012074/1Q9E4t8rQj9iBmkDUxMeqorS4zbKfKXNLgxrAV80TAeDRZBqsULxTdEn8umgKhysGAte"
+    enabled: true
+    priority: 1

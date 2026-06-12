@@ -65,6 +65,7 @@ class Company(BaseModel):
     enabled: bool = Field(default=True, description="Whether to scrape this company")
     priority: int = Field(default=1, description="Scraping priority (lower = first)")
     custom_scraper: Optional[str] = Field(default=None, description="Custom scraper class name")
+    webhook: Optional[str] = Field(default=None, description="Discord webhook URL for alerts (overrides default)")
     
     # Metadata
     created_at: datetime = Field(default_factory=datetime.utcnow)

@@ -78,31 +78,24 @@ class DiscordChannel(BaseAlertChannel):
         """Format summary message for large job batches"""
         from collections import Counter
         companies = Counter(j.company_id for j in jobs)
-        roles = Counter()
-        for job in jobs:
-            for role in job.matched_roles:
-                roles[role.value] += 1
 
         lines = [
-            f"🚨 **Job Radar Alert** - {len(jobs)} new jobs matched!",
+            f"**New Job Alerts: {len(jobs)} positions**",
+            f"*{len(companies)} companies | US-based | Updated now*",
             "",
-            f"📊 **Breakdown:**",
-            f"   Companies: {len(companies)}",
-            f"   Locations: Mostly US-based",
-            "",
-            "🏢 **Top Companies:**",
+            "**Top Hiring Companies:**",
         ]
 
         for company, count in companies.most_common(10):
-            lines.append(f"   • {company.upper()}: {count} jobs")
+            lines.append(f"• **{company.title()}**: {count} positions")
 
         if len(companies) > 10:
-            lines.append(f"   ... and {len(companies) - 10} more")
+            remaining = len(companies) - 10
+            lines.append(f"• *+{remaining} more companies*")
 
         lines.extend([
             "",
-            "📁 **Full details saved to file log**",
-            f"⏰ Check: <t:{int(__import__('time').time())}:R>",
+            "*See file log for complete job list with details*",
         ])
 
         return "\n".join(lines)
@@ -115,11 +108,11 @@ class DiscordChannel(BaseAlertChannel):
         if len(companies) <= 10:
             return ""
 
-        lines = ["🏢 **All Companies:**"]
+        lines = ["**All Companies:**"]
         sorted_companies = sorted(companies.items(), key=lambda x: x[1], reverse=True)
 
         for company, count in sorted_companies:
-            lines.append(f"   • {company.upper()}: {count}")
+            lines.append(f"• **{company.title()}**: {count}")
 
         return "\n".join(lines)
     

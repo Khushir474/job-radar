@@ -88,42 +88,33 @@ class AlertFormatter:
             return self._format_plain(jobs)
     
     def _format_markdown(self, jobs: list[Job]) -> str:
-        # Create a temporary formatter to use the format_jobs_message method
-        formatter = self
         if not jobs:
             return "No new jobs found."
-        
-        lines = [f"🚨 **New Job Alerts** ({len(jobs)} new job{'s' if len(jobs) > 1 else ''})", ""]
-        
+
+        lines = [f"**New Jobs: {len(jobs)} position{'s' if len(jobs) > 1 else ''}**", ""]
+
         for i, job in enumerate(jobs, 1):
-            lines.append(f"**{i}.** {self._format_single_job(job)}")
+            lines.append(f"{i}. {self._format_single_job(job)}")
             if i < len(jobs):
-                lines.append("---")
-        
-        lines.append(f"\n⏰ Checked at {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}")
+                lines.append("")
+
         return "\n".join(lines)
     
     def _format_single_job(self, job: Job) -> str:
         lines = [
-            f"🏢 **{job.company_id.upper()}** - {job.title}",
-            f"📍 {job.location}" if job.location else "",
-            f"🔗 {job.url}",
+            f"**{job.company_id.upper()}**",
+            f"*{job.title}*",
         ]
-        
-        if job.department:
-            lines.append(f"📂 {job.department}")
+
+        if job.location:
+            lines.append(f"Location: {job.location}")
+
         if job.experience_level:
-            lines.append(f"📊 {job.experience_level.value.replace('_', ' ').title()}")
-        if job.matched_roles:
-            roles = ", ".join([r.value.replace('_', ' ').title() for r in job.matched_roles])
-            lines.append(f"🎯 Roles: {roles}")
-        if job.matched_keywords:
-            lines.append(f"🔑 Keywords: {', '.join(job.matched_keywords[:5])}")
-        
-        if self.config.include_description and job.description:
-            desc = job.description[:500] + "..." if len(job.description) > 500 else job.description
-            lines.append(f"\n📝 {desc}")
-        
+            exp = job.experience_level.value.replace('_', ' ').title()
+            lines.append(f"Level: {exp}")
+
+        lines.append(f"{job.url}")
+
         return "\n".join(filter(None, lines))
     
     def _format_html(self, jobs: list[Job]) -> str:

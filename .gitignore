@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Job Radar - Config files with sensitive data (webhooks, company info)
+config/config.yaml
+config/user_companies.yaml
+config/.env

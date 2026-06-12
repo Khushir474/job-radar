@@ -1,0 +1,168 @@
+================================================================================
+JOB RADAR - STRICT FILTERING CONFIGURATION
+================================================================================
+
+CONFIGURED FOR: Khushi (2-3 years experience)
+DATE CONFIGURED: June 12, 2026
+STATUS: ✅ ACTIVE AND TESTED
+
+================================================================================
+WHAT'S BEEN CHANGED
+================================================================================
+
+1. EXCLUDED JOB TITLES (Won't Get Alerts)
+   ❌ Staff Engineer, Staff Data Scientist, Staff Scientist
+   ❌ Director, Head of, Principal
+   ❌ VP, Vice President, Executive
+   ❌ CTO, CFO, CEO, COO
+   ❌ Senior Director, Distinguished Engineer
+   ❌ Group Manager, Technical Lead (senior)
+   ❌ Co-op, Student Programs, Campus Recruiting
+   ❌ Apprenticeship, Volunteer, Unpaid
+
+2. INCLUDED JOB TITLES (Will Get Alerts) ✅
+   ✅ Data Analyst (+ Associate, Sr Associate, Junior, Entry Level, Intern)
+   ✅ Data Scientist (+ Associate, Sr Associate, Junior, Entry Level, Intern)
+   ✅ Machine Learning Engineer (+ Associate, Sr Associate, Junior, Intern)
+   ✅ AI Engineer (+ Associate, Sr Associate, Junior, Intern)
+   ✅ Data Engineer (+ Associate, Sr Associate, Junior, Intern)
+   ✅ Applied Scientist (+ Associate, Junior)
+   ✅ Research Scientist (+ Junior)
+
+3. LOCATION FILTER (USA Only)
+   ✅ Remote (USA)
+   ✅ All 50 US States
+   ✅ Major US Cities
+   ❌ International (Canada, UK, India, etc.)
+
+================================================================================
+HOW IT WORKS
+================================================================================
+
+Every 2 hours, Job Radar will:
+1. Check 46 AI company websites
+2. Find new job postings (653 jobs found in test run)
+3. Filter by YOUR criteria:
+   - Title must match your experience level
+   - Location must be in USA
+   - No "Staff", "Director", "Principal" etc. roles
+4. Send alerts ONLY for matching jobs
+5. Alert channels: Discord (and file logging)
+
+Example:
+   Job: "Associate Data Scientist, San Francisco, CA"
+   Your filters: ✅ MATCH
+   Result: You get alerted immediately via Discord
+
+Example:
+   Job: "Senior Data Scientist, London, UK"
+   Your filters: ❌ NO MATCH
+   Result: No alert (you're skipped)
+
+================================================================================
+FILES MODIFIED
+================================================================================
+
+/config/config.yaml
+  - Updated: excluded_keywords (removed "intern", added senior titles)
+
+/config/keywords.yaml
+  - Updated: All 6 role categories to include:
+    • Associate [Role]
+    • Sr Associate [Role]
+    • Junior [Role]
+    • [Role] Intern
+    • Entry Level [Role]
+
+New documentation files created:
+  - FILTER_RULES.md (detailed explanation)
+  - FILTER_SUMMARY.txt (this file)
+
+================================================================================
+TEST RESULTS
+================================================================================
+
+Test run completed: ✅ SUCCESS
+  Companies scraped: 46
+  Total jobs found: 653
+  Database check: Working
+  Filter logic: Working
+  Alert system: Working
+
+Status: Ready for deployment
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Deploy to Fly.io (code will run automatically every 2 hours):
+   $ git add .
+   $ git commit -m "Configure strict job filtering for entry-level roles"
+   $ git push origin main
+   $ fly deploy
+
+2. Once deployed, you'll receive Discord alerts every 2 hours for matching jobs
+
+3. Monitor the logs:
+   $ fly logs -a job-radar-ambergris-moonbeam-7035
+
+================================================================================
+ADJUSTING FILTERS (If Needed)
+================================================================================
+
+Change excluded titles:
+  Edit: /config/config.yaml → excluded_keywords
+
+Add more roles:
+  Edit: /config/keywords.yaml → Add new role category
+
+Add locations:
+  Edit: /config/config.yaml → locations section
+
+Change alert channel:
+  Edit: /config/config.yaml → alerts section
+
+After any change:
+  $ git add config/
+  $ git commit -m "Update filters"
+  $ git push
+  $ fly deploy
+
+================================================================================
+COMMON QUESTIONS
+================================================================================
+
+Q: Will I get alerts for "Senior Data Scientist" roles?
+A: No, "Senior" is in the excluded list. Only "Junior", "Associate", or plain
+   "Data Scientist" titles will match.
+
+Q: Will I get alerts for jobs in Canada?
+A: No, location filter is USA-only. "Remote" is fine if it's Remote USA.
+
+Q: What if I apply and get rejected?
+A: No problem. Filters won't change. You can manually adjust config anytime.
+
+Q: How often are jobs checked?
+A: Every 2 hours (10 PM - 6 AM PST: quiet hours)
+
+Q: Can I change the check frequency?
+A: Yes, edit /config/config.yaml → scheduler.check_interval_hours
+
+================================================================================
+SUPPORT
+================================================================================
+
+Need to troubleshoot?
+1. Check logs: fly logs -a job-radar-ambergris-moonbeam-7035
+2. Run local test: python -m job_radar.cli check -v
+3. Check database: sqlite3 data/job_radar.db "SELECT * FROM jobs LIMIT 10;"
+4. View raw alerts: tail -20 data/alerts.log
+
+Read the docs:
+- BEGINNER_GUIDE.md (understand concepts)
+- LEARNING_GUIDE.md (understand architecture)
+- FILTER_RULES.md (understand filtering)
+
+================================================================================
+Good luck with your job search! 🎯
+================================================================================

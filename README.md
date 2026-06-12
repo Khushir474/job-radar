@@ -190,12 +190,14 @@ companies:
 
 | Platform | Cost | Effort | Best For |
 |----------|------|--------|----------|
-| **VPS (Hetzner/DO)** | $4-6/mo | Medium | Full control, always on |
-| **Railway.app** | $5/mo | Low | Quick deploy, git-based |
-| **Fly.io** | ~$5/mo | Low | Docker-native, global |
+| **Railway.app** ⭐ | $5/mo | Low | **Teams, easy updates, no SSH needed** |
+| **VPS (Hetzner/DO)** | $4-6/mo | Medium | Full control, lowest cost |
+| **Fly.io** | ~$5/mo | Low | Global deployment, high reliability |
 | **Modal.com** | Pay-per-use | Low | Serverless, scales to zero |
 | **GitHub Actions** | Free | Low | Limited (6hr max, no persistence) |
 | **Local Server** | Hardware | Medium | No monthly cost |
+
+**Recommended:** Railway.app for teams and public deployments (see [Railway.app section](#railwayapp-recommended-for-teams--new-users-) below)
 
 ### VPS Setup (Hetzner CX22 - €4.51/mo)
 ```bash
@@ -207,15 +209,87 @@ cp .env.example .env  # Add credentials
 docker compose up -d --build job-radar-cron
 ```
 
-### Railway.app
+### Railway.app (Recommended for Teams & New Users) ⭐
+
+**Best for:** Easy deployment, no server management, auto-scaling, team collaboration.
+
+#### Setup (5 minutes)
+
+**1. Create Railway Account**
+- Go to [Railway.app](https://railway.app)
+- Sign up with GitHub (recommended)
+
+**2. Connect Repository**
 ```bash
-npm i -g @railway/cli
+npm install -g @railway/cli
 railway login
+cd job-radar
 railway init
-railway variables set TELEGRAM_BOT_TOKEN=xxx TELEGRAM_CHAT_IDS=xxx
-railway up
-# Add cron in Railway dashboard: "0 */2 * * *"
 ```
+- Select "Create new project"
+- Follow prompts, select GitHub repo
+
+**3. Set Environment Variables** (via Web UI)
+- Go to Railway dashboard → Your Project
+- Click "Variables" tab
+- Add each variable:
+  ```
+  TELEGRAM_BOT_TOKEN=your_bot_token
+  TELEGRAM_CHAT_IDS=123456789,-1001234567890
+  DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+  EMAIL_SMTP_HOST=smtp.gmail.com
+  EMAIL_SMTP_PORT=587
+  EMAIL_USERNAME=your@gmail.com
+  EMAIL_PASSWORD=your_app_password
+  EMAIL_FROM=Job Radar <your@gmail.com>
+  EMAIL_RECIPIENTS=user1@example.com,user2@example.com
+  CHECK_INTERVAL_HOURS=2
+  QUIET_HOURS_START=22:00
+  QUIET_HOURS_END=06:00
+  TIMEZONE=America/Los_Angeles
+  LOG_LEVEL=INFO
+  ```
+
+**4. Deploy**
+```bash
+railway up
+```
+
+**5. Set Up 2-Hour Cron Job**
+- In Railway Dashboard → Project Settings → Cron Jobs
+- Click "Create Cron Job"
+- Schedule: `0 */2 * * *` (every 2 hours)
+- Command: `python -m job_radar.cli check`
+- Click "Deploy"
+
+**6. Test**
+```bash
+railway run python -m job_radar.cli check
+railway run python -m job_radar.cli test-alerts
+```
+
+#### Monitoring
+- **Logs:** Railway Dashboard → Logs tab (real-time)
+- **Redeploy:** Push to main branch (automatic)
+- **Rollback:** Click "Revert" if something breaks
+- **Check status:** `railway status`
+
+#### Updating Code
+```bash
+git push origin main
+# Railway auto-deploys in ~1 minute
+# Check Railway dashboard for status
+```
+
+#### Adding Team Members
+- Railway Dashboard → Project Settings → Members
+- Copy project link, share with teammates
+- They can update variables, view logs, trigger deploys
+
+#### Cost
+- **$5/month** starting (only pay for compute when running)
+- Cron job runs 2 min × 12 times/day = 24 min/day
+- Very affordable ($0.50/month typical)
 
 ### Modal.com (Serverless)
 ```bash

@@ -24,33 +24,104 @@ class DiscordChannel(BaseAlertChannel):
     async def send(self, jobs: list[Job], recipient: Optional[str] = None) -> tuple[bool, Optional[str]]:
         if not self.is_enabled:
             return False, "Channel not enabled"
-        
+
         # Use custom webhook if provided, otherwise use config
         webhook_url = recipient or self.config.discord_webhook_url
-        
-        # Format for Discord (uses markdown)
-        formatter = AlertFormatter(self.config)
-        content = formatter.format_for_channel("discord", jobs)
-        
-        # Discord has 2000 char limit per message
-        if len(content) > 1900:
-            content = content[:1900] + "\n... (truncated)"
-        
-        payload = {
-            "content": content,
-            "username": "Job Radar",
-            "avatar_url": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-        }
-        
+
         try:
             async with httpx.AsyncClient(timeout=30) as client:
-                response = await client.post(webhook_url, json=payload)
-                response.raise_for_status()
+                # For large batches, send summary + company breakdown
+                if len(jobs) > 20:
+                    # Send summary message
+                    summary = self._format_summary(jobs)
+                    payload = {
+                        "content": summary,
+                        "username": "Job Radar",
+                        "avatar_url": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                    }
+                    response = await client.post(webhook_url, json=payload)
+                    response.raise_for_status()
+
+                    # Send company breakdown
+                    breakdown = self._format_company_breakdown(jobs)
+                    if breakdown:
+                        payload = {
+                            "content": breakdown,
+                            "username": "Job Radar",
+                        }
+                        response = await client.post(webhook_url, json=payload)
+                        response.raise_for_status()
+                else:
+                    # For small batches, send detailed list
+                    formatter = AlertFormatter(self.config)
+                    content = formatter.format_for_channel("discord", jobs)
+
+                    # Discord has 2000 char limit per message
+                    if len(content) > 1900:
+                        content = content[:1900] + "\n... (see file log for full list)"
+
+                    payload = {
+                        "content": content,
+                        "username": "Job Radar",
+                        "avatar_url": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                    }
+                    response = await client.post(webhook_url, json=payload)
+                    response.raise_for_status()
+
                 return True, None
         except httpx.HTTPStatusError as e:
             return False, f"Discord webhook error: {e.response.status_code} - {e.response.text}"
         except Exception as e:
             return False, f"Error sending to Discord: {str(e)}"
+
+    def _format_summary(self, jobs: list[Job]) -> str:
+        """Format summary message for large job batches"""
+        from collections import Counter
+        companies = Counter(j.company_id for j in jobs)
+        roles = Counter()
+        for job in jobs:
+            for role in job.matched_roles:
+                roles[role.value] += 1
+
+        lines = [
+            f"🚨 **Job Radar Alert** - {len(jobs)} new jobs matched!",
+            "",
+            f"📊 **Breakdown:**",
+            f"   Companies: {len(companies)}",
+            f"   Locations: Mostly US-based",
+            "",
+            "🏢 **Top Companies:**",
+        ]
+
+        for company, count in companies.most_common(10):
+            lines.append(f"   • {company.upper()}: {count} jobs")
+
+        if len(companies) > 10:
+            lines.append(f"   ... and {len(companies) - 10} more")
+
+        lines.extend([
+            "",
+            "📁 **Full details saved to file log**",
+            f"⏰ Check: <t:{int(__import__('time').time())}:R>",
+        ])
+
+        return "\n".join(lines)
+
+    def _format_company_breakdown(self, jobs: list[Job]) -> str:
+        """Format company breakdown message"""
+        from collections import Counter
+        companies = Counter(j.company_id for j in jobs)
+
+        if len(companies) <= 10:
+            return ""
+
+        lines = ["🏢 **All Companies:**"]
+        sorted_companies = sorted(companies.items(), key=lambda x: x[1], reverse=True)
+
+        for company, count in sorted_companies:
+            lines.append(f"   • {company.upper()}: {count}")
+
+        return "\n".join(lines)
     
     async def test_connection(self) -> tuple[bool, Optional[str]]:
         """Test Discord webhook"""

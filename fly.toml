@@ -1,0 +1,45 @@
+# Fly.io configuration for Job Radar
+# Deploy with: fly launch --name job-radar
+# Or update existing: fly deploy
+
+app = "job-radar"
+primary_region = "sjc"  # San Jose, USA (adjust to your region)
+
+[build]
+  image = "job-radar:latest"
+  dockerfile = "Dockerfile"
+
+[env]
+  PYTHONUNBUFFERED = "true"
+  LOG_LEVEL = "INFO"
+
+[processes]
+  # Main cron job (runs every 2 hours)
+  cron = "python -m job_radar.cli check"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8000
+
+  [[services.ports]]
+    port = 8000
+
+[checks]
+  [checks.status]
+    type = "http"
+    uri = "/health"
+    interval = "30s"
+    timeout = "5s"
+
+[[mounts]]
+  source = "job_radar_data"
+  destination = "/app/data"
+  initial_size = "1gb"
+
+[[mounts]]
+  source = "job_radar_logs"
+  destination = "/app/logs"
+  initial_size = "500mb"
+
+[deploy]
+  release_command = "python -m job_radar.database init"

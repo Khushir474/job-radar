@@ -190,14 +190,12 @@ companies:
 
 | Platform | Cost | Effort | Best For |
 |----------|------|--------|----------|
-| **Railway.app** ⭐ | $5/mo | Low | **Teams, easy updates, no SSH needed** |
-| **VPS (Hetzner/DO)** | $4-6/mo | Medium | Full control, lowest cost |
-| **Fly.io** | ~$5/mo | Low | Global deployment, high reliability |
+| **Fly.io** ⭐ | $5-10/mo | Low | **Production-grade, Docker-native, resume builder** |
+| **Railway.app** | $5/mo | Very Low | Teams, easiest UI, no Docker knowledge |
+| **VPS (Hetzner)** | €4.51/mo | Medium | Cheapest, full control, manual setup |
 | **Modal.com** | Pay-per-use | Low | Serverless, scales to zero |
-| **GitHub Actions** | Free | Low | Limited (6hr max, no persistence) |
-| **Local Server** | Hardware | Medium | No monthly cost |
 
-**Recommended:** Railway.app for teams and public deployments (see [Railway.app section](#railwayapp-recommended-for-teams--new-users-) below)
+**Recommended:** Fly.io for production deployments and resume impact (see [Fly.io section](#flyio-production-deployment-) below)
 
 ### VPS Setup (Hetzner CX22 - €4.51/mo)
 ```bash
@@ -209,87 +207,141 @@ cp .env.example .env  # Add credentials
 docker compose up -d --build job-radar-cron
 ```
 
-### Railway.app (Recommended for Teams & New Users) ⭐
+### Fly.io (Production Deployment) ⭐
 
-**Best for:** Easy deployment, no server management, auto-scaling, team collaboration.
+**Best for:** Production-grade deployment, Docker expertise, resume builder, global reach.
 
-#### Setup (5 minutes)
-
-**1. Create Railway Account**
-- Go to [Railway.app](https://railway.app)
-- Sign up with GitHub (recommended)
-
-**2. Connect Repository**
+#### Prerequisites
 ```bash
-npm install -g @railway/cli
-railway login
-cd job-radar
-railway init
-```
-- Select "Create new project"
-- Follow prompts, select GitHub repo
+# Install Fly CLI
+curl -L https://fly.io/install.sh | sh
 
-**3. Set Environment Variables** (via Web UI)
-- Go to Railway dashboard → Your Project
-- Click "Variables" tab
-- Add each variable:
-  ```
-  TELEGRAM_BOT_TOKEN=your_bot_token
-  TELEGRAM_CHAT_IDS=123456789,-1001234567890
-  DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
-  EMAIL_SMTP_HOST=smtp.gmail.com
-  EMAIL_SMTP_PORT=587
-  EMAIL_USERNAME=your@gmail.com
-  EMAIL_PASSWORD=your_app_password
-  EMAIL_FROM=Job Radar <your@gmail.com>
-  EMAIL_RECIPIENTS=user1@example.com,user2@example.com
-  CHECK_INTERVAL_HOURS=2
-  QUIET_HOURS_START=22:00
-  QUIET_HOURS_END=06:00
-  TIMEZONE=America/Los_Angeles
-  LOG_LEVEL=INFO
-  ```
+# Sign up (free account)
+fly auth signup
+# or
+fly auth login
+```
+
+#### Setup (10 minutes)
+
+**1. Initialize Fly.io**
+```bash
+cd job-radar
+fly launch --name job-radar
+```
+Follow prompts:
+- Region: Choose closest to you (sjc = San Jose, lax = LA, ord = Chicago, etc.)
+- PostgreSQL: No (use persistent volumes instead)
+- Accept `fly.toml` configuration
+
+**2. Create Persistent Volumes** (for data storage)
+```bash
+fly volumes create job_radar_data --size 1
+fly volumes create job_radar_logs --size 1
+```
+
+**3. Set Secrets** (environment variables)
+```bash
+fly secrets set TELEGRAM_BOT_TOKEN=your_bot_token
+fly secrets set TELEGRAM_CHAT_IDS=123456789,-1001234567890
+fly secrets set DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+fly secrets set EMAIL_SMTP_HOST=smtp.gmail.com
+fly secrets set EMAIL_SMTP_PORT=587
+fly secrets set EMAIL_USERNAME=your@gmail.com
+fly secrets set EMAIL_PASSWORD=your_app_password
+fly secrets set EMAIL_FROM="Job Radar <your@gmail.com>"
+fly secrets set EMAIL_RECIPIENTS=user1@example.com,user2@example.com
+fly secrets set CHECK_INTERVAL_HOURS=2
+fly secrets set QUIET_HOURS_START=22:00
+fly secrets set QUIET_HOURS_END=06:00
+fly secrets set TIMEZONE=America/Los_Angeles
+fly secrets set LOG_LEVEL=INFO
+```
 
 **4. Deploy**
 ```bash
-railway up
+fly deploy
 ```
 
-**5. Set Up 2-Hour Cron Job**
-- In Railway Dashboard → Project Settings → Cron Jobs
-- Click "Create Cron Job"
-- Schedule: `0 */2 * * *` (every 2 hours)
-- Command: `python -m job_radar.cli check`
-- Click "Deploy"
+**5. Set Up Cron Job** (2-hour scheduling)
+```bash
+fly machine run \
+  --name job-radar-cron \
+  --schedule "0 */2 * * *" \
+  python -m job_radar.cli check
+```
 
 **6. Test**
 ```bash
-railway run python -m job_radar.cli check
-railway run python -m job_radar.cli test-alerts
+# Run check manually
+fly ssh console -s
+python -m job_radar.cli check
+python -m job_radar.cli test-alerts
+exit
 ```
 
-#### Monitoring
-- **Logs:** Railway Dashboard → Logs tab (real-time)
-- **Redeploy:** Push to main branch (automatic)
-- **Rollback:** Click "Revert" if something breaks
-- **Check status:** `railway status`
+#### Monitoring & Logs
+```bash
+# Real-time logs
+fly logs
+
+# Check status
+fly status
+
+# SSH into instance for debugging
+fly ssh console
+
+# View volumes
+fly volumes list
+```
 
 #### Updating Code
 ```bash
 git push origin main
-# Railway auto-deploys in ~1 minute
-# Check Railway dashboard for status
+fly deploy
+# Live in ~2 minutes
 ```
 
-#### Adding Team Members
-- Railway Dashboard → Project Settings → Members
-- Copy project link, share with teammates
-- They can update variables, view logs, trigger deploys
+#### Scaling & Performance
+```bash
+# View instances
+fly machines list
 
-#### Cost
-- **$5/month** starting (only pay for compute when running)
-- Cron job runs 2 min × 12 times/day = 24 min/day
-- Very affordable ($0.50/month typical)
+# Increase memory if needed
+fly machines update <machine-id> --memory 512
+
+# Check current cost
+fly billing summary
+```
+
+#### Cost Breakdown
+- **Compute:** $5-10/mo (pay only for runtime)
+- **Persistent Storage:** ~$0.15/GB/mo (1GB = $0.15/mo)
+- **Total:** ~$5.50/mo typical
+
+**Cheaper if you:**
+- Stop cron job (manual trigger only)
+- Scale down to shared CPU
+
+#### Monitoring Dashboard
+- Go to [fly.io/dashboard](https://fly.io/dashboard)
+- View real-time metrics, logs, deployments
+- One-click rollbacks
+
+#### Production Checklist
+- ✅ Docker containerization
+- ✅ Environment secrets (not in code)
+- ✅ Persistent data volumes
+- ✅ Monitoring & logs
+- ✅ Auto-rollback on failure
+- ✅ Global CDN distribution
+- ✅ Health checks
+
+---
+
+### Railway.app (Easiest for Beginners)
+
+If you prefer a **no-SSH, web-UI-only** approach, see [docs/railway.md](docs/railway.md) (Railway is great for teams but simpler tech stack)
 
 ### Modal.com (Serverless)
 ```bash

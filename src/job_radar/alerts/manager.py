@@ -6,7 +6,7 @@ import logging
 from typing import Optional
 
 from job_radar.alerts.formatter import AlertFormatter
-from job_radar.alerts.imessage import IMessageChannel
+from job_radar.alerts.imessage import MacOSMessagesChannel
 from job_radar.alerts.telegram import TelegramChannel
 from job_radar.alerts.discord import DiscordChannel
 from job_radar.alerts.email import EmailChannel
@@ -23,7 +23,7 @@ class AlertManager:
         self.config = config
         self.formatter = AlertFormatter(config)
         self.channels = {
-            "imessage": IMessageChannel(config),
+            "imessage": MacOSMessagesChannel(config),
             "telegram": TelegramChannel(config),
             "discord": DiscordChannel(config),
             "email": EmailChannel(config),
